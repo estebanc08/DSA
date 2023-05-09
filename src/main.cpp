@@ -1,43 +1,40 @@
 #include "main.hpp"
 
 int main(){
+    BST<int> tree;
+    std::string input = "";
+    tree.insert(5);
+    tree.insert(3);
+    tree.insert(1);
+    tree.insert(4);
+    tree.insert(9);
+    tree.insert(8);
+    tree.insert(10);
+    tree.insert(13);
+    tree.insert(11);
+    tree.insert(12);
+    tree.insert(14);
 
-    SinglyLinkedList<int> list;
-    for(unsigned int i = 0; i < 10; i++){
-        list.push_front(i);
-    }
-    for(unsigned int i = 10; i < 20; i++){
-        list.push_back(i);
-    }
-    for(unsigned int i = 0; i < 20; i+=2){
-        list.insert(i*20, i);
-    }
-    list.removeAt(29);
-    list.removeAt(0);
-    SinglyLinkedList<int> newList;
-    newList = list;
-    newList[1] = 30;
-    SinglyLinkedList<int> copyList = newList;
-    copyList[1] = 1000;
-    copyList.clear();
-    copyList.push_back(50);
-    list.printList();
-    newList.printList();
-    copyList.printList();
-    std::cout << list.at(0) << "\n";
+    tree.printLevelOrder();
+    std::cout << tree.size() << "\n";
+
+    tree.remove(5);
+    tree.remove(4);
+
+    std::cout << tree.size() << "\n";
+
+    tree.clear();
+    if(tree.empty())
+        std::cout << "empty\n";
+    else
+        std::cout << "failed\n";
+    
+    tree.insert(100);
+
+    if(tree.empty())
+        std::cout << "failed\n";
+    else
+        std::cout << "not empty\n";
+    
     return 0;
-
 }
-    // sf::VideoMode fullScreen = sf::VideoMode::getDesktopMode();
-    // sf::RenderWindow window(fullScreen, "Data structures");
-    // sf::Event event;
-    // while(window.isOpen()){
-    //     while(window.pollEvent(event)){
-    //         if(event.type == sf::Event::Closed){
-    //             window.close();
-    //             break;
-    //         }
-    //     }
-    //     window.clear();
-    //     window.display();
-    // }
