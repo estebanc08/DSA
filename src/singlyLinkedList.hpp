@@ -63,6 +63,10 @@ class SinglyLinkedList{
         /// @return value at that position
         T at(unsigned int pos);
 
+        /// @brief Returns if the list is empty
+        /// @return 
+        bool empty();
+
 
     private:
         struct Node{
@@ -251,6 +255,11 @@ void SinglyLinkedList<T>::clear(){
         temp = next;
     }
     head = nullptr;
+}
+
+template <typename T>
+bool SinglyLinkedList<T>::empty(){
+    return this->_size == 0;
 }
 
 #endif
