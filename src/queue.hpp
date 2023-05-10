@@ -4,7 +4,7 @@
 #include <iostream>
 #include "singlyLinkedList.hpp"
 
-
+/// @brief Container with First in First out behavior
 template <typename T>
 class Queue{
     public:
@@ -48,7 +48,7 @@ Queue<T>::Queue(){
 
 template <typename T>
 Queue<T>::~Queue(){
-    list->clear();
+    delete list;
 }
 
 template <typename T>
