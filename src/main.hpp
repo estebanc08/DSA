@@ -2,3 +2,4 @@
 #include "singlyLinkedList.hpp"
 #include "bst.hpp"
 #include "queue.hpp"
+#include "set.hpp"

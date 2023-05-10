@@ -38,10 +38,6 @@ class Queue{
         bool empty();
         
     private:
-        struct Node{
-            T data;
-            Node(T _data) : data(_data) {};
-        };
         SinglyLinkedList<T>* list;
 };
 
