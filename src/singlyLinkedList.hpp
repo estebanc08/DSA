@@ -76,6 +76,7 @@ class SinglyLinkedList{
         };
         unsigned int _size = 0;
         Node* head = nullptr;
+        Node* tail = nullptr;
 };
 
 template<typename T>
@@ -101,16 +102,14 @@ template<typename T>
 void SinglyLinkedList<T>::push_back(T data){
     if(!head){
         push_front(data);
+        this->tail = this->head;
         return;
     }
 
     this->_size++;
-    Node* temp = head;
-    while(temp && temp->next){
-        temp = temp->next;
-    }
     Node* newTail = new Node(data);
-    temp->next = newTail;
+    tail->next = newTail;
+    tail = newTail;
     return;
 }
 
@@ -175,6 +174,9 @@ void SinglyLinkedList<T>::removeAt(unsigned int pos){
     Node* newNext = temp->next->next;
     delete temp->next;
     temp->next = newNext;
+    if(!newNext){
+        this->tail = temp;
+    }
 }
 
 template <typename T>
@@ -209,6 +211,7 @@ SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(const SinglyLinkedList<T>& R
     this->_size = RHS._size;
     Node* oldTemp = RHS.head;
     this->head = nullptr;
+    this->tail = nullptr;
     if(this->_size == 0)
         return (*this);
     Node* newHead = new Node(oldTemp->data);
@@ -220,6 +223,7 @@ SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(const SinglyLinkedList<T>& R
         oldTemp = oldTemp->next;
         temp = curr;
     }
+    this->tail = temp;
     this->head = newHead;
     return (*this);
 }
@@ -240,6 +244,7 @@ SinglyLinkedList<T>::SinglyLinkedList(const SinglyLinkedList<T>& RHS){
         oldTemp = oldTemp->next;
         temp = curr;
     }
+    this->tail = temp;
     this->head = newHead;
 }
 
@@ -254,7 +259,8 @@ void SinglyLinkedList<T>::clear(){
         delete temp;
         temp = next;
     }
-    head = nullptr;
+    this->head = nullptr;
+    this->tail = nullptr;
 }
 
 template <typename T>

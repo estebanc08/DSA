@@ -2,7 +2,7 @@
 #define BINARY_SEARCH_TREE
 
 #include <iostream>
-#include <queue>
+#include "queue.hpp"
 
 template <typename T>
 class BST{
@@ -273,7 +273,7 @@ void BST<T>::printLevelOrder(){
     if(!this->head)
         return;
     
-    std::queue<Node*> q;
+    Queue<Node*> q;
     unsigned int level = 1;
     q.push(this->head);
     while(!q.empty()){

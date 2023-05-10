@@ -1,40 +1,21 @@
 #include "main.hpp"
-
+#include <random>
 int main(){
+    Queue<int> q;
+    for(unsigned int i = 10; i > 0; i--)
+        q.push(i);
+    std::cout << q.size() << "\n";
+    std::cout << q.front() << "\n";
+    std::cout << q.back() << "\n";
+
     BST<int> tree;
-    std::string input = "";
-    tree.insert(5);
-    tree.insert(3);
-    tree.insert(1);
-    tree.insert(4);
-    tree.insert(9);
-    tree.insert(8);
-    tree.insert(10);
-    tree.insert(13);
-    tree.insert(11);
-    tree.insert(12);
-    tree.insert(14);
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<int> dist(1, 100);
 
-    tree.printLevelOrder();
-    std::cout << tree.size() << "\n";
-
-    tree.remove(5);
-    tree.remove(4);
-
-    std::cout << tree.size() << "\n";
-
-    tree.clear();
-    if(tree.empty())
-        std::cout << "empty\n";
-    else
-        std::cout << "failed\n";
-    
-    tree.insert(100);
-
-    if(tree.empty())
-        std::cout << "failed\n";
-    else
-        std::cout << "not empty\n";
+    for(unsigned int i = 0; i < 150; i++){
+        tree.insert(dist(rng));
+    }
+    tree.printLevelOrder(); 
     
     return 0;
 }
