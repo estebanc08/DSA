@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-
+/// @brief Singly Linked List with head and tail pointers
 template <class T> 
 class SinglyLinkedList{
     public:
