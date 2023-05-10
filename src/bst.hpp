@@ -5,7 +5,7 @@
 #include "queue.hpp"
 #include <iterator>
 
-
+/// @brief Binary Search Tree implementation
 template <typename T>
 class BST{
     private:

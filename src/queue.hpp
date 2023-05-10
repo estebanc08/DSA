@@ -4,7 +4,7 @@
 #include <iostream>
 #include "singlyLinkedList.hpp"
 
-
+/// @brief Container with First in First out behavior
 template <typename T>
 class Queue{
     public:

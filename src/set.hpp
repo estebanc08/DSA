@@ -5,6 +5,7 @@
 #include "bst.hpp"
 #include <iterator>
 
+/// @brief Container with unique keys and logarithmic lookup
 template <typename T>
 class Set{
     private:

@@ -4,6 +4,7 @@
 #include <iostream>
 #include "singlyLinkedList.hpp"
 
+/// @brief First in Last out container implementation
 template <typename T>
 class Stack{
     public:
