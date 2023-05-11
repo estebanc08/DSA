@@ -122,28 +122,58 @@ class RedBlackTree{
     
     private:
 
+        /// @brief Rotate Left on delete or insert
+        /// @param curr 
         void rotateLeft(Node* curr);
 
+        /// @brief Rotate Right on delete or insert
+        /// @param curr 
         void rotateRight(Node* curr);
 
         unsigned int _size;
 
+        /// @brief Used to recursively insert
+        /// @param curr Current Node
+        /// @param parent Parent Node
+        /// @return Return New Node
         Node* insertHelper(Node* curr, Node* parent);
 
+        /// @brief Returns if the node is black
+        /// @param curr Current Node to check
+        /// @return True if Black, red if false
         bool isBlack(Node* curr);
 
+        /// @brief Get the Inorder Sucessor
+        /// @param curr Node to get the successor of
+        /// @return Return Inorder Succesor
         Node* inorderSuccessor(Node* curr);
 
+        /// @brief Helper function to recursively remove
+        /// @param data Value of node to delete
+        /// @param curr Current Node to look at
+        /// @return Node to delete
         Node* removeHelper(T data, Node* curr);
 
+        /// @brief Helps balance tree after remove
+        /// @param curr Node that was removed
         void fixRemove(Node* curr);
 
+        /// @brief Change color of Node
+        /// @param curr Node to change
+        /// @param color New color
         void recolor(Node* curr, Node::Color color);
 
+        /// @brief Checks the number of nodes in path from root to leaf
+        /// @param curr Current Node
+        /// @return Number of black nodes on patg
         int checkBlackHeight(Node* curr);
 
+        /// @brief helps balance tree after insert
+        /// @param curr Node that was inserted
         void fixInsert(Node* curr);
 
+        /// @brief Helper function to make destructor faster
+        /// @param curr Current Node to delete
         void postOrderDelete(Node* curr);
 
         /// @brief Testing purpose, Used to make sure all paths contain same number of black nodes
