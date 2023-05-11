@@ -2,6 +2,7 @@
 #define HEAP
 
 #include <vector>
+#include <iostream>
 
 /// @brief Max heap implementation with fixed time to access max value
 template <typename T>
@@ -59,7 +60,7 @@ unsigned int Heap<T>::size(){
 template <typename T>
 void Heap<T>::removeMax(){
     if(heap.size() == 0)
-        throw  std::out_of_range("Heap is empty");
+        throw std::out_of_range("Heap is empty");
     heap[0] = heap.back();
     heap.pop_back();
     heapifyDown(0);
