@@ -1,23 +1,22 @@
-#ifndef Red_Black_TREE
-#define Red_Black_TREE
+#ifndef RED_BLACK_TREE
+#define RED_BLACK_TREE
 
 #include <iterator>
 #include <iostream>
 
 /// @brief Standard container for red black tree with logarithmic search, deletion, and insertion
-template <typename T>
+template <typename Key, typename Value>
 class RedBlackTree{
      private:
-        /// @brief Holds the data for each element in the tree
+        /// @brief Holds the key for each element in the tree
         struct Node{
-            unsigned int count = 0;
             enum Color {Black, Red, DoubleBlack};
             Color color;
-            T data;
+            std::pair<Key, Value> data;
             Node* left;
             Node* right;
             Node* parent;
-            Node(T _data) : data(_data) {color = Color::Red; this->count = 1;};
+            Node(Key _key,Value _value ) : data(std::make_pair(_key, _value)) {color = Color::Red;};
         };
         Node* root;
     
@@ -34,12 +33,13 @@ class RedBlackTree{
         unsigned int size();
 
         /// @brief Insert new value into tree
-        /// @param data Value to be inserted
-        void insert(T data);
+        /// @param key Key to be inserted
+        /// @param value Value to be inserted
+        void insert(Key key, Value value);
 
         /// @brief Remove value from tree
-        /// @param data Value to remove
-        void remove(T data);
+        /// @param key Key to be removed
+        void remove(Key key);
 
         /// @brief Checks if the tree is empty
         /// @return Returns true if tree is empty
@@ -51,12 +51,12 @@ class RedBlackTree{
             public:
                 using iterator_category = std::forward_iterator_tag;
                 using difference_type = std::ptrdiff_t;
-                using value_type = T;
-                using pointer = T*;
-                using reference = T&;
+                using value_type = std::pair<Key, Value>;
+                using pointer = value_type*;
+                using reference = value_type&;
 
                 /// @brief default constructor, set to null if no parameter passed               
-                Iterator(Node* node = nullptr, unsigned int _count = 0) : current(node), count(_count) {}
+                Iterator(Node* node = nullptr) : current(node) {}
 
                 /// @brief Dereference the iterator
                 /// @return Value at the Iterator
@@ -67,7 +67,7 @@ class RedBlackTree{
                 /// @brief Dereference pointer
                 /// @return Pointer to the iterator
                 pointer operator->() const {
-                    return &(current->data);
+                    return &current->data;
                 }
 
                 /// @brief Move to next value in tree
@@ -91,8 +91,7 @@ class RedBlackTree{
                 }
 
             private:
-                RedBlackTree<T>::Node* current;
-                unsigned int count = 0;
+                RedBlackTree<Key, Value>::Node* current;
         };
 
         /// @brief Points to min value in the tree
@@ -102,23 +101,19 @@ class RedBlackTree{
             while (node->left != nullptr) {
                 node = node->left;
             }
-            unsigned int count = 0;
-            if(node){
-                count = node->count;
-            }
-            return Iterator(node, count);
+            return Iterator(node);
         }
 
-        /// @brief Gets the end of available data for tree
+        /// @brief Gets the end of available key for tree
         /// @return Returns Iterator that points past the end of the tree
         Iterator end() {
             return Iterator(nullptr);
         }
 
         /// @brief Finds value in the tree
-        /// @param data Value to find
+        /// @param key Value to find
         /// @return Returns Iterator to value if found in tree, otherwise returns end
-        Iterator find(T data);
+        Iterator find(Key key);
     
     private:
 
@@ -149,10 +144,10 @@ class RedBlackTree{
         Node* inorderSuccessor(Node* curr);
 
         /// @brief Helper function to recursively remove
-        /// @param data Value of node to delete
+        /// @param key Value of node to delete
         /// @param curr Current Node to look at
         /// @return Node to delete
-        Node* removeHelper(T data, Node* curr);
+        Node* removeHelper(Key key, Node* curr);
 
         /// @brief Helps balance tree after remove
         /// @param curr Node that was removed
@@ -181,68 +176,52 @@ class RedBlackTree{
         bool isValid();
 };
 
-template <typename T>
-RedBlackTree<T>::Iterator& RedBlackTree<T>::Iterator::operator++(){
+template <typename Key, typename Value>
+RedBlackTree<Key, Value>::Iterator& RedBlackTree<Key, Value>::Iterator::operator++(){
     if (current->right != nullptr) {
-        if(count > 1){
-            count--;
-        }
-        else{
-            current = current->right;
-            while (current->left != nullptr) {
-                current = current->left;
-            }
-            if(current){
-                count = current->count;
-            }
+        current = current->right;
+        while (current->left != nullptr) {
+            current = current->left;
         }
     }
     else {
-        if(count > 1){
-            count--;
-        }
-        else{
-            Node* temp = current->parent;
-            while (temp != nullptr && current == temp->right) {
-                current = temp;
-                temp = temp->parent;
-            }
+        Node* temp = current->parent;
+        while (temp != nullptr && current == temp->right) {
             current = temp;
-            if(current){
-                count = current->count;
-            }
+            temp = temp->parent;
         }
+        current = temp;
     }
     return *this;
 }
 
-template <typename T>
-RedBlackTree<T>::Iterator RedBlackTree<T>::Iterator::operator++(int){
+template <typename Key, typename Value>
+RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::Iterator::operator++(int){
     Iterator temp(*this);
     ++(*this);
     return temp;
 }
 
 
-template <typename T>
-unsigned int RedBlackTree<T>::size(){
+template <typename Key, typename Value>
+unsigned int RedBlackTree<Key, Value>::size(){
     return this->_size;
 }
 
-template <typename T>
-RedBlackTree<T>::RedBlackTree(){
+template <typename Key, typename Value>
+RedBlackTree<Key, Value>::RedBlackTree(){
     this->_size = 0;
     this->root = nullptr;
 }
 
-template <typename T>
-RedBlackTree<T>::~RedBlackTree() {
+template <typename Key, typename Value>
+RedBlackTree<Key, Value>::~RedBlackTree() {
     postOrderDelete(root);
 }
 
-template <typename T>
-void RedBlackTree<T>::postOrderDelete(RedBlackTree<T>::Node* curr) {
-    if (curr == nullptr) {
+template <typename Key, typename Value>
+void RedBlackTree<Key, Value>::postOrderDelete(RedBlackTree<Key, Value>::Node* curr) {
+    if (!curr) {
         return;
     }
     postOrderDelete(curr->left);
@@ -251,15 +230,15 @@ void RedBlackTree<T>::postOrderDelete(RedBlackTree<T>::Node* curr) {
 }
 
 
-template <typename T>
-RedBlackTree<T>::Iterator RedBlackTree<T>::find(T data){
+template <typename Key, typename Value>
+RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::find(Key key){
     if(this->_size == 0)
         end();
 
     for(auto it = begin(); it != end(); it++){
-        if((*it) == data)
+        if((*it).first == key)
             return it;
-        if((*it) > data)
+        if((*it).first > key)
             return end();
     }
 
@@ -267,16 +246,19 @@ RedBlackTree<T>::Iterator RedBlackTree<T>::find(T data){
 }
 
 
-template <typename T>
-void RedBlackTree<T>::insert(T data){
-    Node* newNode = new Node(data);
+template <typename Key, typename Value>
+void RedBlackTree<Key, Value>::insert(Key key, Value value){
+    unsigned int currSize = ++this->_size;
+    Node* newNode = new Node(key, value);
     this->root = insertHelper(root, newNode);
-    fixInsert(newNode);
-    this->_size++;
+    if(currSize != this->_size){
+        delete newNode;
+    }
+    else fixInsert(newNode);
 };
 
-template <typename T>
-void RedBlackTree<T>::rotateLeft(RedBlackTree<T>::Node* curr){
+template <typename Key, typename Value>
+void RedBlackTree<Key, Value>::rotateLeft(RedBlackTree<Key, Value>::Node* curr){
     Node* rightChild = curr->right;
     curr->right = rightChild->left;
 
@@ -296,8 +278,8 @@ void RedBlackTree<T>::rotateLeft(RedBlackTree<T>::Node* curr){
     curr->parent = rightChild;
 }
 
-template <typename T>
-void RedBlackTree<T>::rotateRight(RedBlackTree<T>::Node* curr){
+template <typename Key, typename Value>
+void RedBlackTree<Key, Value>::rotateRight(RedBlackTree<Key, Value>::Node* curr){
     Node* leftChild = curr->left;
     curr->left = leftChild->right;
 
@@ -317,27 +299,28 @@ void RedBlackTree<T>::rotateRight(RedBlackTree<T>::Node* curr){
     curr->parent = leftChild;
 }
 
-template <typename T>
-RedBlackTree<T>::Node* RedBlackTree<T>::insertHelper(RedBlackTree<T>::Node* root, RedBlackTree<T>::Node* curr){
-    if (root == nullptr)
+template <typename Key, typename Value>
+RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::insertHelper(RedBlackTree<Key, Value>::Node* root, RedBlackTree<Key, Value>::Node* curr){
+    if (!root)
         return curr;
 
-    if (curr->data < root->data) {
+    if (curr->data.first < root->data.first) {
         root->left = insertHelper(root->left, curr);
         root->left->parent = root;
-    } else if (curr->data > root->data) {
+    } 
+    else if (curr->data.first > root->data.first) {
         root->right = insertHelper(root->right, curr);
         root->right->parent = root;
     }
     else{
-        root->count++;
+        this->_size--;
     }
 
     return root;
 }
 
-template <typename T>
-void RedBlackTree<T>::fixInsert(RedBlackTree<T>::Node* curr){
+template <typename Key, typename Value>
+void RedBlackTree<Key, Value>::fixInsert(RedBlackTree<Key, Value>::Node* curr){
     Node *_parent = nullptr;
     Node *grandparent = nullptr;
     while (curr != root && !isBlack(curr) && !isBlack(curr->parent)) {
@@ -389,47 +372,38 @@ void RedBlackTree<T>::fixInsert(RedBlackTree<T>::Node* curr){
     recolor(root, Node::Color::Black);
 }
 
-template <typename T>
-void RedBlackTree<T>::remove(T data){
-    Node* curr = removeHelper(data, root);
+template <typename Key, typename Value>
+void RedBlackTree<Key, Value>::remove(Key key){
+    if(empty() || find(key) == end())
+        throw std::out_of_range("Value not in tree");
+    Node* curr = removeHelper(key, root);
     this->_size--;
     fixRemove(curr);
 }
 
 
-template <typename T>
-RedBlackTree<T>::Node* RedBlackTree<T>::removeHelper(T data, RedBlackTree<T>::Node* curr){
-    if(!curr){
-        throw std::out_of_range("Value not in tree");
+template <typename Key, typename Value>
+RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::removeHelper(Key key, RedBlackTree<Key, Value>::Node* curr){
+    if(curr->data.first < key){
+        return removeHelper(key, curr->right);
     }
-    if(curr->data < data){
-        return removeHelper(data, curr->right);
-    }
-    if(curr->data > data){
-        return removeHelper(data, curr->left);
-    }
-    if(curr->count > 1){
-        curr->count--;
-        return curr;
+    if(curr->data.first > key){
+        return removeHelper(key, curr->left);
     }
     if(!curr->left || !curr->right)
         return curr;
-    curr->count = 0;
     Node* inorder = inorderSuccessor(curr);
-    curr->data = inorder->data;
-    return removeHelper(inorder->data, curr->right);
+    curr->data.first = inorder->data.first;
+    return removeHelper(inorder->data.first, curr->right);
 }
 
-template <typename T>
-void RedBlackTree<T>::fixRemove(RedBlackTree<T>::Node* curr){
+template <typename Key, typename Value>
+void RedBlackTree<Key, Value>::fixRemove(RedBlackTree<Key, Value>::Node* curr){
     if (curr == nullptr)
         return;
 
     if (curr == root) {
         root = nullptr;
-        return;
-    }
-    if(curr->count > 0){
         return;
     }
     if (!isBlack(curr) || !isBlack(curr->left) || !isBlack(curr->right)) {
@@ -523,8 +497,8 @@ void RedBlackTree<T>::fixRemove(RedBlackTree<T>::Node* curr){
     }
 }
 
-template <typename T>
-RedBlackTree<T>::Node* RedBlackTree<T>::inorderSuccessor(RedBlackTree<T>::Node* curr){
+template <typename Key, typename Value>
+RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::inorderSuccessor(RedBlackTree<Key, Value>::Node* curr){
     if(!curr->right)
         return nullptr;
     Node* temp = curr->right;
@@ -534,15 +508,15 @@ RedBlackTree<T>::Node* RedBlackTree<T>::inorderSuccessor(RedBlackTree<T>::Node* 
     return temp;
 }
 
-template <typename T>
-void RedBlackTree<T>::recolor(RedBlackTree<T>::Node* curr, RedBlackTree<T>::Node::Color color){
+template <typename Key, typename Value>
+void RedBlackTree<Key, Value>::recolor(RedBlackTree<Key, Value>::Node* curr, RedBlackTree<Key, Value>::Node::Color color){
     if(!curr)
         return;
     curr->color = color;
 }
 
-template <typename T>
-bool RedBlackTree<T>::isBlack(RedBlackTree<T>::Node* curr){
+template <typename Key, typename Value>
+bool RedBlackTree<Key, Value>::isBlack(RedBlackTree<Key, Value>::Node* curr){
     if(curr && curr->color == Node::Color::Red)
         return false;
     else return true;
@@ -550,27 +524,26 @@ bool RedBlackTree<T>::isBlack(RedBlackTree<T>::Node* curr){
 
 
 
-template <typename T>
-bool RedBlackTree<T>::empty(){
+template <typename Key, typename Value>
+bool RedBlackTree<Key, Value>::empty(){
     return this->_size == 0;
 }
 
-template <typename T>
-bool RedBlackTree<T>::isValid(){
+template <typename Key, typename Value>
+bool RedBlackTree<Key, Value>::isValid(){
     if (root == nullptr) {
         return true;
     }
 
     if (root->color != Node::Color::Black) {
-        std::cout << "root not black\n";
         return false;
     }
 
     return checkBlackHeight(root) != -1;
 }
 
-template <typename T>
-int RedBlackTree<T>::checkBlackHeight(RedBlackTree<T>::Node* curr){
+template <typename Key, typename Value>
+int RedBlackTree<Key, Value>::checkBlackHeight(RedBlackTree<Key, Value>::Node* curr){
     if (curr == nullptr) {
         return 1;
     }
@@ -579,12 +552,10 @@ int RedBlackTree<T>::checkBlackHeight(RedBlackTree<T>::Node* curr){
     int rightHeight = checkBlackHeight(curr->right);
 
     if (leftHeight == -1 || rightHeight == -1 || leftHeight != rightHeight) {
-        std::cout << "left and right height dont match: " << leftHeight << " " << rightHeight << "\n";
         return -1;
     }
 
     if (curr->color == Node::Color::Red && !isBlack(curr->left) && !isBlack(curr->right)){
-        std::cout << "red node with two red children\n";
         return -1;
     }
 
