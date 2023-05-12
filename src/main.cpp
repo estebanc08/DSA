@@ -5,22 +5,24 @@
 int main(){
     std::mt19937 rng(std::random_device{}());
     // Generate a random integer between 1 and 100
-    std::uniform_int_distribution<int> dist(0,100000);
-    std::vector<int> v;
-    RedBlackTree<int> tree;
-    for(unsigned int i = 0; i < 100000; i++){
-        tree.insert(dist(rng));
+    std::uniform_int_distribution<int> dist(0,1000);
+    RedBlackTree<int, std::vector<int>> tree;
+
+    for(unsigned int i = 0; i < 100; i++){
+        std::vector<int> temp;
+        for(unsigned int j = 0; j < 15; j++){
+            temp.push_back(dist(rng));
+        }
+        std::cout << i << " " << temp.size() << "\n";
+        tree.insert(i, temp);
     }
-    
-    for(unsigned int i = 0; i < 1000; i++){
-            std::uniform_int_distribution<int> offset(0,tree.size() -1);
-            auto it = tree.begin();
-            unsigned int toDel = offset(rng);
-            for(unsigned int i = 0; i < toDel; i++){
-                it++;
-            }
-            unsigned int val = (*it);
-            tree.remove(val);
+
+    for(auto it : tree){
+        std::cout << it.first << ": ";
+        for(unsigned int i = 0; i < it.second.size(); i++){
+            std::cout << it.second[i] << " ";
+        }
+        std::cout << "\n";
     }
     return 0;
 }
