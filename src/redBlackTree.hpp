@@ -1,5 +1,5 @@
-#ifndef Red_Black_TREE
-#define Red_Black_TREE
+#ifndef RED_BLACK_TREE
+#define RED_BLACK_TREE
 
 #include <iterator>
 #include <iostream>
@@ -33,11 +33,12 @@ class RedBlackTree{
         unsigned int size();
 
         /// @brief Insert new value into tree
-        /// @param key Value to be inserted
+        /// @param key Key to be inserted
+        /// @param value Value to be inserted
         void insert(Key key, Value value);
 
         /// @brief Remove value from tree
-        /// @param key Value to remove
+        /// @param key Key to be removed
         void remove(Key key);
 
         /// @brief Checks if the tree is empty
@@ -535,7 +536,6 @@ bool RedBlackTree<Key, Value>::isValid(){
     }
 
     if (root->color != Node::Color::Black) {
-        std::cout << "root not black\n";
         return false;
     }
 
@@ -552,12 +552,10 @@ int RedBlackTree<Key, Value>::checkBlackHeight(RedBlackTree<Key, Value>::Node* c
     int rightHeight = checkBlackHeight(curr->right);
 
     if (leftHeight == -1 || rightHeight == -1 || leftHeight != rightHeight) {
-        std::cout << "left and right height dont match: " << leftHeight << " " << rightHeight << "\n";
         return -1;
     }
 
     if (curr->color == Node::Color::Red && !isBlack(curr->left) && !isBlack(curr->right)){
-        std::cout << "red node with two red children\n";
         return -1;
     }
 
