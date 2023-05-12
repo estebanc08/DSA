@@ -10,14 +10,13 @@ class RedBlackTree{
      private:
         /// @brief Holds the data for each element in the tree
         struct Node{
-            unsigned int count = 0;
             enum Color {Black, Red, DoubleBlack};
             Color color;
             T data;
             Node* left;
             Node* right;
             Node* parent;
-            Node(T _data) : data(_data) {color = Color::Red; this->count = 1;};
+            Node(T _data) : data(_data) {color = Color::Red;};
         };
         Node* root;
     
@@ -56,7 +55,7 @@ class RedBlackTree{
                 using reference = T&;
 
                 /// @brief default constructor, set to null if no parameter passed               
-                Iterator(Node* node = nullptr, unsigned int _count = 0) : current(node), count(_count) {}
+                Iterator(Node* node = nullptr) : current(node) {}
 
                 /// @brief Dereference the iterator
                 /// @return Value at the Iterator
@@ -92,7 +91,6 @@ class RedBlackTree{
 
             private:
                 RedBlackTree<T>::Node* current;
-                unsigned int count = 0;
         };
 
         /// @brief Points to min value in the tree
@@ -102,11 +100,7 @@ class RedBlackTree{
             while (node->left != nullptr) {
                 node = node->left;
             }
-            unsigned int count = 0;
-            if(node){
-                count = node->count;
-            }
-            return Iterator(node, count);
+            return Iterator(node);
         }
 
         /// @brief Gets the end of available data for tree
@@ -184,34 +178,18 @@ class RedBlackTree{
 template <typename T>
 RedBlackTree<T>::Iterator& RedBlackTree<T>::Iterator::operator++(){
     if (current->right != nullptr) {
-        if(count > 1){
-            count--;
-        }
-        else{
-            current = current->right;
-            while (current->left != nullptr) {
-                current = current->left;
-            }
-            if(current){
-                count = current->count;
-            }
+        current = current->right;
+        while (current->left != nullptr) {
+            current = current->left;
         }
     }
     else {
-        if(count > 1){
-            count--;
-        }
-        else{
-            Node* temp = current->parent;
-            while (temp != nullptr && current == temp->right) {
-                current = temp;
-                temp = temp->parent;
-            }
+        Node* temp = current->parent;
+        while (temp != nullptr && current == temp->right) {
             current = temp;
-            if(current){
-                count = current->count;
-            }
+            temp = temp->parent;
         }
+        current = temp;
     }
     return *this;
 }
@@ -242,7 +220,7 @@ RedBlackTree<T>::~RedBlackTree() {
 
 template <typename T>
 void RedBlackTree<T>::postOrderDelete(RedBlackTree<T>::Node* curr) {
-    if (curr == nullptr) {
+    if (!curr) {
         return;
     }
     postOrderDelete(curr->left);
@@ -269,10 +247,13 @@ RedBlackTree<T>::Iterator RedBlackTree<T>::find(T data){
 
 template <typename T>
 void RedBlackTree<T>::insert(T data){
+    unsigned int currSize = ++this->_size;
     Node* newNode = new Node(data);
     this->root = insertHelper(root, newNode);
-    fixInsert(newNode);
-    this->_size++;
+    if(currSize != this->_size){
+        delete newNode;
+    }
+    else fixInsert(newNode);
 };
 
 template <typename T>
@@ -319,18 +300,19 @@ void RedBlackTree<T>::rotateRight(RedBlackTree<T>::Node* curr){
 
 template <typename T>
 RedBlackTree<T>::Node* RedBlackTree<T>::insertHelper(RedBlackTree<T>::Node* root, RedBlackTree<T>::Node* curr){
-    if (root == nullptr)
+    if (!root)
         return curr;
 
     if (curr->data < root->data) {
         root->left = insertHelper(root->left, curr);
         root->left->parent = root;
-    } else if (curr->data > root->data) {
+    } 
+    else if (curr->data > root->data) {
         root->right = insertHelper(root->right, curr);
         root->right->parent = root;
     }
     else{
-        root->count++;
+        this->_size--;
     }
 
     return root;
@@ -391,6 +373,8 @@ void RedBlackTree<T>::fixInsert(RedBlackTree<T>::Node* curr){
 
 template <typename T>
 void RedBlackTree<T>::remove(T data){
+    if(empty() || find(data) == end())
+        throw std::out_of_range("Value not in tree");
     Node* curr = removeHelper(data, root);
     this->_size--;
     fixRemove(curr);
@@ -399,22 +383,14 @@ void RedBlackTree<T>::remove(T data){
 
 template <typename T>
 RedBlackTree<T>::Node* RedBlackTree<T>::removeHelper(T data, RedBlackTree<T>::Node* curr){
-    if(!curr){
-        throw std::out_of_range("Value not in tree");
-    }
     if(curr->data < data){
         return removeHelper(data, curr->right);
     }
     if(curr->data > data){
         return removeHelper(data, curr->left);
     }
-    if(curr->count > 1){
-        curr->count--;
-        return curr;
-    }
     if(!curr->left || !curr->right)
         return curr;
-    curr->count = 0;
     Node* inorder = inorderSuccessor(curr);
     curr->data = inorder->data;
     return removeHelper(inorder->data, curr->right);
@@ -427,9 +403,6 @@ void RedBlackTree<T>::fixRemove(RedBlackTree<T>::Node* curr){
 
     if (curr == root) {
         root = nullptr;
-        return;
-    }
-    if(curr->count > 0){
         return;
     }
     if (!isBlack(curr) || !isBlack(curr->left) || !isBlack(curr->right)) {
