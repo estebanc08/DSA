@@ -6,3 +6,4 @@
 #include "stack.hpp"
 #include "heap.hpp"
 #include "redBlackTree.hpp"
+#include "map.hpp"

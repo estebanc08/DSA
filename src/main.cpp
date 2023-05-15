@@ -1,28 +1,23 @@
 #include "main.hpp"
 #include <random>
 #include <set>
-
+#include <map>
 int main(){
     std::mt19937 rng(std::random_device{}());
     // Generate a random integer between 1 and 100
     std::uniform_int_distribution<int> dist(0,1000);
-    RedBlackTree<int, std::vector<int>> tree;
-
+    std::uniform_real_distribution<float> fl(0.0,1.0);
+    Map<int, float> myMap;
     for(unsigned int i = 0; i < 100; i++){
-        std::vector<int> temp;
-        for(unsigned int j = 0; j < 15; j++){
-            temp.push_back(dist(rng));
-        }
-        std::cout << i << " " << temp.size() << "\n";
-        tree.insert(i, temp);
+        myMap[i] = fl(rng) * 1000;
     }
-
-    for(auto it : tree){
-        std::cout << it.first << ": ";
-        for(unsigned int i = 0; i < it.second.size(); i++){
-            std::cout << it.second[i] << " ";
-        }
-        std::cout << "\n";
-    }
+    for(auto it : myMap)
+        std::cout << it.first << " " << it.second << "\n";
+    myMap[99] = 100001.5f;
+    std::cout << myMap[100] << "\n";
+    std::cout << myMap.size() << "\n";
+    if(myMap.erase(100) != myMap.end())
+        std::cout << myMap.size() << "\n";
+    std::map<int,int> trial;
     return 0;
 }
