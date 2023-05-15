@@ -5,6 +5,8 @@
 #include <iostream>
 
 /// @brief Standard container for red black tree with logarithmic search, deletion, and insertion
+/// @tparam Key constant Key value
+/// @tparam Value type of mapped object
 template <typename Key, typename Value>
 class RedBlackTree{
      private:
@@ -31,15 +33,6 @@ class RedBlackTree{
         /// @brief Gets the size of the tree
         /// @return Size of the tree
         unsigned int size();
-
-        /// @brief Insert new value into tree
-        /// @param key Key to be inserted
-        /// @param value Value to be inserted
-        void insert(Key key, Value value);
-
-        /// @brief Remove value from tree
-        /// @param key Key to be removed
-        void remove(Key key);
 
         /// @brief Checks if the tree is empty
         /// @return Returns true if tree is empty
@@ -114,6 +107,16 @@ class RedBlackTree{
         /// @param key Value to find
         /// @return Returns Iterator to value if found in tree, otherwise returns end
         Iterator find(Key key);
+
+        /// @brief Insert new value into tree
+        /// @param key Key to be inserted
+        /// @param value Value to be inserted
+        Iterator insert(std::pair<const Key, Value> pair);
+
+        /// @brief Remove value from tree
+        /// @param key Key to be removed
+        /// @return Iterator to element before removal
+        Iterator remove(Key key);
     
     private:
 
@@ -131,7 +134,7 @@ class RedBlackTree{
         /// @param curr Current Node
         /// @param parent Parent Node
         /// @return Return New Node
-        Node* insertHelper(Node* curr, Node* parent);
+        Node* insertHelper(Node* _root, Node* curr);
 
         /// @brief Returns if the node is black
         /// @param curr Current Node to check
@@ -235,27 +238,52 @@ RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::find(Key key){
     if(this->_size == 0)
         end();
 
-    for(auto it = begin(); it != end(); it++){
-        if((*it).first == key)
-            return it;
-        if((*it).first > key)
-            return end();
+    Node* current = this->root;
+    while(current){
+        if(current->data.first > key){
+            current = current->left;
+        }
+        else if(current->data.first < key){
+            current = current->right;
+        }
+        else break; //found
     }
-
-    return end();
+    if(!current)
+        return end();
+    return Iterator(current);
 }
 
 
 template <typename Key, typename Value>
-void RedBlackTree<Key, Value>::insert(Key key, Value value){
+RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::insert(std::pair<const Key, Value> pair){
+    Iterator it = find(pair.first);
+    if(it != end())
+        return it;
+
     unsigned int currSize = ++this->_size;
-    Node* newNode = new Node(key, value);
+    Node* newNode = new Node(pair.first, pair.second);
     this->root = insertHelper(root, newNode);
-    if(currSize != this->_size){
-        delete newNode;
-    }
-    else fixInsert(newNode);
+    fixInsert(newNode);
+    return Iterator(newNode);
 };
+
+
+template <typename Key, typename Value>
+RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::insertHelper(RedBlackTree<Key, Value>::Node* _root, RedBlackTree<Key, Value>::Node* curr){
+    if (!_root){
+        return curr;
+    }
+
+    if (curr->data.first < _root->data.first) {
+        _root->left = insertHelper(_root->left, curr);
+        _root->left->parent = _root;
+    } 
+    else if (curr->data.first > _root->data.first) {
+        _root->right = insertHelper(_root->right, curr);
+        _root->right->parent = _root;
+    }
+    return _root;
+}
 
 template <typename Key, typename Value>
 void RedBlackTree<Key, Value>::rotateLeft(RedBlackTree<Key, Value>::Node* curr){
@@ -297,26 +325,6 @@ void RedBlackTree<Key, Value>::rotateRight(RedBlackTree<Key, Value>::Node* curr)
 
     leftChild->right = curr;
     curr->parent = leftChild;
-}
-
-template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::insertHelper(RedBlackTree<Key, Value>::Node* root, RedBlackTree<Key, Value>::Node* curr){
-    if (!root)
-        return curr;
-
-    if (curr->data.first < root->data.first) {
-        root->left = insertHelper(root->left, curr);
-        root->left->parent = root;
-    } 
-    else if (curr->data.first > root->data.first) {
-        root->right = insertHelper(root->right, curr);
-        root->right->parent = root;
-    }
-    else{
-        this->_size--;
-    }
-
-    return root;
 }
 
 template <typename Key, typename Value>
@@ -373,17 +381,21 @@ void RedBlackTree<Key, Value>::fixInsert(RedBlackTree<Key, Value>::Node* curr){
 }
 
 template <typename Key, typename Value>
-void RedBlackTree<Key, Value>::remove(Key key){
+RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::remove(Key key){
     if(empty() || find(key) == end())
-        throw std::out_of_range("Value not in tree");
+        return end();
     Node* curr = removeHelper(key, root);
     this->_size--;
     fixRemove(curr);
+    return Iterator(curr);
 }
 
 
 template <typename Key, typename Value>
 RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::removeHelper(Key key, RedBlackTree<Key, Value>::Node* curr){
+    if(!curr){
+        throw std::out_of_range("Value not in tree");
+    }
     if(curr->data.first < key){
         return removeHelper(key, curr->right);
     }
