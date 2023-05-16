@@ -4,81 +4,82 @@
 #include <iostream>
 #include <vector>
 
-
-/// @brief Container to retrieve words in linear time
-class Trie{
-    public:
-        
-        /// @brief Default Trie constructor
-        Trie();
-
-        /// @brief Default Trie destructor
-        ~Trie();
-
-        /// @brief Insert new word into Trie
-        /// @param word Word to insert
-        void insert(std::string word);
-
-        /// @brief Remove word from Trie
-        /// @param word Word to remove
-        /// @return Return true if word was removed
-        bool remove(std::string word);
-
-        /// @brief Gets the number of words in the Trie
-        unsigned int size();
-
-        /// @brief Searches for word in Trie
-        /// @param word Word to search
-        /// @return Returns true if word is in Trie
-        bool search(std::string word);
-
-        /// @brief Finds all words that start with given prefix
-        /// @return Vector with all words that start with given prefix
-        std::vector<std::string> startsWith(std::string prefix);
-
-        /// @brief Returns if Trie is empty
-        bool empty();
-
-        /// @brief Clears all values in the trie
-        void clear();
-
-    private:
-        struct Node{
-            Node();
-
-            std::vector<Node*> children;
+namespace mystl{
+    /// @brief Container to retrieve words in linear time
+    class Trie{
+        public:
             
-            bool terminal;
-        };
-        
-        Node* root;
+            /// @brief Default Trie constructor
+            Trie();
 
-        unsigned int _size;
+            /// @brief Default Trie destructor
+            ~Trie();
 
-        int getIndex(char letter);
+            /// @brief Insert new word into Trie
+            /// @param word Word to insert
+            void insert(std::string word);
 
-        void clearHelper(Node* curr);
+            /// @brief Remove word from Trie
+            /// @param word Word to remove
+            /// @return Return true if word was removed
+            bool remove(std::string word);
 
-        void startsWithHelper(Node* curr, std::string& currentPrefix, std::vector<std::string>& words);
+            /// @brief Gets the number of words in the Trie
+            unsigned int size();
 
-};
+            /// @brief Searches for word in Trie
+            /// @param word Word to search
+            /// @return Returns true if word is in Trie
+            bool search(std::string word);
 
-Trie::Node::Node(){
+            /// @brief Finds all words that start with given prefix
+            /// @return Vector with all words that start with given prefix
+            std::vector<std::string> startsWith(std::string prefix);
+
+            /// @brief Returns if Trie is empty
+            bool empty();
+
+            /// @brief Clears all values in the trie
+            void clear();
+
+        private:
+            struct Node{
+                Node();
+
+                std::vector<Node*> children;
+                
+                bool terminal;
+            };
+            
+            Node* root;
+
+            unsigned int _size;
+
+            int getIndex(char letter);
+
+            void clearHelper(Node* curr);
+
+            void startsWithHelper(Node* curr, std::string& currentPrefix, std::vector<std::string>& words);
+
+    };
+}
+
+mystl::Trie::Node::Node(){
     this->children.resize(52);
     this->children.shrink_to_fit();
     this->terminal = false;
 }
 
-Trie::Trie(){
+mystl::Trie::Trie(){
     this->_size = 0;
     this->root = new Node();
 }
 
-Trie::~Trie(){
+mystl::Trie::~Trie(){
     clear();
 }
 
-void Trie::insert(std::string word){
+void mystl::Trie::insert(std::string word){
     Node* curr = this->root;
 
     if(search(word))
@@ -99,7 +100,7 @@ void Trie::insert(std::string word){
     this->_size++;
 }
 
-bool Trie::search(std::string word){
+bool mystl::Trie::search(std::string word){
     Node* curr = this->root;
 
     for(unsigned int i = 0; i < word.size(); i++){
@@ -114,7 +115,7 @@ bool Trie::search(std::string word){
     return curr->terminal;
 }
 
-bool Trie::remove(std::string word){
+bool mystl::Trie::remove(std::string word){
     Node* curr = this->root;
 
     std::vector<Node*> path;
@@ -151,20 +152,20 @@ bool Trie::remove(std::string word){
     return true;
 }
 
-unsigned int Trie::size(){
+unsigned int mystl::Trie::size(){
     return this->_size;
 }
 
-bool Trie::empty(){
+bool mystl::Trie::empty(){
     return this->_size == 0;
 }
 
-void Trie::clear(){
+void mystl::Trie::clear(){
     clearHelper(this->root);
     this->_size = 0;
 }
 
-void Trie::clearHelper(Trie::Node* curr){
+void mystl::Trie::clearHelper(mystl::Trie::Node* curr){
     if(!curr)
         return;
     
@@ -175,7 +176,7 @@ void Trie::clearHelper(Trie::Node* curr){
     delete curr;
 }
 
-std::vector<std::string> Trie::startsWith(std::string prefix) {
+std::vector<std::string> mystl::Trie::startsWith(std::string prefix) {
     Node* curr = this->root;
 
     for (unsigned int i = 0; i < prefix.size(); i++) {
@@ -193,7 +194,7 @@ std::vector<std::string> Trie::startsWith(std::string prefix) {
     return words;
 }
 
-void Trie::startsWithHelper(Node* curr, std::string& currentPrefix, std::vector<std::string>& words) {
+void mystl::Trie::startsWithHelper(Node* curr, std::string& currentPrefix, std::vector<std::string>& words) {
     if (curr->terminal) {
         words.push_back(currentPrefix);
     }
@@ -212,7 +213,7 @@ void Trie::startsWithHelper(Node* curr, std::string& currentPrefix, std::vector<
 }
 
 
-int Trie::getIndex(char letter){
+int mystl::Trie::getIndex(char letter){
     if(letter >= 'a' && letter <= 'z')
         return letter - 'a';
     else if(letter >= 'A' && letter <= 'Z') //capitalization matters

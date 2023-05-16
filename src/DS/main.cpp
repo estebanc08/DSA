@@ -1,42 +1,26 @@
 #include "main.hpp"
 #include <random>
-
+#include <map>
 int main(){
     std::mt19937 rng(std::random_device{}());
     // Generate a random integer between 1 and 100
-    std::uniform_int_distribution<int> dist(0,1000);
     std::uniform_real_distribution<float> fl(0.0,1.0);
-    Trie trie;
-    trie.insert("word");
-    trie.insert("worm");
-    trie.insert("worms");
-    trie.insert("wormSSSS");
 
-    // if(trie.search("word"))
-    //     std::cout << "found\n";
-    // else
-    //     std::cout << "not Found\n";
-    
-    // if(trie.search("worm"))
-    //     std::cout << "found\n";
-    // else
-    //     std::cout << "not Found\n";
-    
-    // if(trie.search("worms"))
-    //     std::cout << "found\n";
-    // else
-    //     std::cout << "not Found\n";
-    
-    // if(trie.search("wor"))
-    //     std::cout << "found\n";
-    // else
-    //     std::cout << "not Found\n";
-    
-    // std::cout << trie.size() << "\n";
+    std::uniform_int_distribution<int> dist(0,1000);
+    mystl::Map<int, std::vector<int>> map;
 
-    std::vector<std::string> temp = trie.startsWith("wo");
-    for(std::string curr : temp)
-        std::cout << curr << " ";
-    std::cout << "\n";
+    for(unsigned int i = 0; i < 10; i++){
+        std::vector<int> temp;
+        for(unsigned int j = 0; j < 20; j++){
+            temp.push_back(dist(rng));
+        }
+        map[i] = temp;
+    }
+
+    for(auto it : map){
+        for(int it : it.second)
+            std::cout << it << " ";
+        std::cout << "\n";
+    }
     return 0;
 }
