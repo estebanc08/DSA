@@ -4,183 +4,193 @@
 #include <iterator>
 #include <iostream>
 
-/// @brief Standard container for red black tree with logarithmic search, deletion, and insertion
-/// @tparam Key constant Key value
-/// @tparam Value type of mapped object
-template <typename Key, typename Value>
-class RedBlackTree{
-     private:
-        /// @brief Holds the key for each element in the tree
-        struct Node{
-            enum Color {Black, Red, DoubleBlack};
-            Color color;
-            std::pair<Key, Value> data;
-            Node* left;
-            Node* right;
-            Node* parent;
-            Node(Key _key,Value _value ) : data(std::make_pair(_key, _value)) {color = Color::Red;};
-        };
-        Node* root;
-    
-    public:
+namespace mystl{
+    /// @brief Standard container for red black tree with logarithmic search, deletion, and insertion
+    /// @tparam Key constant Key value
+    /// @tparam Value type of mapped object
+    template <typename Key, typename Value>
+    class RedBlackTree{
+        private:
+            /// @brief Holds the key for each element in the tree
+            struct Node{
+                enum Color {Black, Red, DoubleBlack};
+                Color color;
+                std::pair<Key, Value> data;
+                Node* left;
+                Node* right;
+                Node* parent;
+                Node(std::pair<Key, Value>&& _pair);
+            };
+            Node* root;
+        
+        public:
 
-        /// @brief Default Constructor. Size set to 0 and root is null
-        RedBlackTree();
+            /// @brief Default Constructor. Size set to 0 and root is null
+            RedBlackTree();
 
-        /// @brief Destructor. Free all memory from nodes
-        ~RedBlackTree();
+            /// @brief Destructor. Free all memory from nodes
+            ~RedBlackTree();
 
-        /// @brief Gets the size of the tree
-        /// @return Size of the tree
-        unsigned int size();
+            /// @brief Gets the size of the tree
+            /// @return Size of the tree
+            unsigned int size();
 
-        /// @brief Checks if the tree is empty
-        /// @return Returns true if tree is empty
-        bool empty();
+            /// @brief Checks if the tree is empty
+            /// @return Returns true if tree is empty
+            bool empty();
 
 
-    /// @brief Red-Black Tree class Iterator
-        class Iterator {
-            public:
-                using iterator_category = std::forward_iterator_tag;
-                using difference_type = std::ptrdiff_t;
-                using value_type = std::pair<Key, Value>;
-                using pointer = value_type*;
-                using reference = value_type&;
+        /// @brief Red-Black Tree class Iterator
+            class Iterator {
+                public:
+                    using iterator_category = std::forward_iterator_tag;
+                    using difference_type = std::ptrdiff_t;
+                    using value_type = std::pair<Key, Value>;
+                    using pointer = value_type*;
+                    using reference = value_type&;
 
-                /// @brief default constructor, set to null if no parameter passed               
-                Iterator(Node* node = nullptr) : current(node) {}
+                    /// @brief default constructor, set to null if no parameter passed               
+                    Iterator(Node* node = nullptr) : current(node) {}
 
-                /// @brief Dereference the iterator
-                /// @return Value at the Iterator
-                reference operator*() const {
-                    return current->data;
+                    /// @brief Dereference the iterator
+                    /// @return Value at the Iterator
+                    reference operator*() const {
+                        return current->data;
+                    }
+
+                    /// @brief Dereference pointer
+                    /// @return Pointer to the iterator
+                    pointer operator->() const {
+                        return &current->data;
+                    }
+
+                    /// @brief Move to next value in tree
+                    /// @return Reference to next Iterator
+                    Iterator& operator++();
+
+                    /// @brief Move the iterator forward by N values
+                    /// @return Iterator at new value
+                    Iterator operator++(int);
+
+                    /// @brief Compares if iterators equal
+                    /// @return True if iterators point to same value
+                    bool operator==(const Iterator& other) const {
+                        return current == other.current;
+                    }
+
+                    /// @brief Compares if Iterators not equal
+                    /// @return True if they are not equal
+                    bool operator!=(const Iterator& other) const {
+                        return !(*this == other);
+                    }
+
+                private:
+                    mystl::RedBlackTree<Key, Value>::Node* current;
+            };
+
+            /// @brief Points to min value in the tree
+            /// @return Returns iterator to the start of the tree 
+            Iterator begin() {
+                Node* node = root;
+                while (node->left != nullptr) {
+                    node = node->left;
                 }
-
-                /// @brief Dereference pointer
-                /// @return Pointer to the iterator
-                pointer operator->() const {
-                    return &current->data;
-                }
-
-                /// @brief Move to next value in tree
-                /// @return Reference to next Iterator
-                Iterator& operator++();
-
-                /// @brief Move the iterator forward by N values
-                /// @return Iterator at new value
-                Iterator operator++(int);
-
-                /// @brief Compares if iterators equal
-                /// @return True if iterators point to same value
-                bool operator==(const Iterator& other) const {
-                    return current == other.current;
-                }
-
-                /// @brief Compares if Iterators not equal
-                /// @return True if they are not equal
-                bool operator!=(const Iterator& other) const {
-                    return !(*this == other);
-                }
-
-            private:
-                RedBlackTree<Key, Value>::Node* current;
-        };
-
-        /// @brief Points to min value in the tree
-        /// @return Returns iterator to the start of the tree 
-        Iterator begin() {
-            Node* node = root;
-            while (node->left != nullptr) {
-                node = node->left;
+                return Iterator(node);
             }
-            return Iterator(node);
-        }
 
-        /// @brief Gets the end of available key for tree
-        /// @return Returns Iterator that points past the end of the tree
-        Iterator end() {
-            return Iterator(nullptr);
-        }
+            /// @brief Gets the end of available key for tree
+            /// @return Returns Iterator that points past the end of the tree
+            Iterator end() {
+                return Iterator(nullptr);
+            }
 
-        /// @brief Finds value in the tree
-        /// @param key Value to find
-        /// @return Returns Iterator to value if found in tree, otherwise returns end
-        Iterator find(Key key);
+            /// @brief Finds value in the tree
+            /// @param key Value to find
+            /// @return Returns Iterator to value if found in tree, otherwise returns end
+            Iterator find(const Key key);
 
-        /// @brief Insert new value into tree
-        /// @param key Key to be inserted
-        /// @param value Value to be inserted
-        Iterator insert(std::pair<const Key, Value> pair);
+            /// @brief Insert new value into tree
+            /// @param key Key to be inserted
+            /// @param value Value to be inserted
+            Iterator insert(std::pair<const Key, Value> pair);
 
-        /// @brief Remove value from tree
-        /// @param key Key to be removed
-        /// @return Iterator to element before removal
-        Iterator remove(Key key);
-    
-    private:
+            /// @brief Remove value from tree
+            /// @param key Key to be removed
+            /// @return Iterator to element before removal
+            Iterator remove(Key key);
+        
+        private:
 
-        /// @brief Rotate Left on delete or insert
-        /// @param curr 
-        void rotateLeft(Node* curr);
+            /// @brief Rotate Left on delete or insert
+            /// @param curr 
+            void rotateLeft(Node* curr);
 
-        /// @brief Rotate Right on delete or insert
-        /// @param curr 
-        void rotateRight(Node* curr);
+            /// @brief Rotate Right on delete or insert
+            /// @param curr 
+            void rotateRight(Node* curr);
 
-        unsigned int _size;
+            unsigned int _size;
 
-        /// @brief Used to recursively insert
-        /// @param curr Current Node
-        /// @param parent Parent Node
-        /// @return Return New Node
-        Node* insertHelper(Node* _root, Node* curr);
+            /// @brief Used to recursively insert
+            /// @param curr Current Node
+            /// @param parent Parent Node
+            /// @return Return New Node
+            Node* insertHelper(Node* _root, Node* curr);
 
-        /// @brief Returns if the node is black
-        /// @param curr Current Node to check
-        /// @return True if Black, red if false
-        bool isBlack(Node* curr);
+            /// @brief Returns if the node is black
+            /// @param curr Current Node to check
+            /// @return True if Black, red if false
+            bool isBlack(Node* curr);
 
-        /// @brief Get the Inorder Sucessor
-        /// @param curr Node to get the successor of
-        /// @return Return Inorder Succesor
-        Node* inorderSuccessor(Node* curr);
+            /// @brief Get the Inorder Sucessor
+            /// @param curr Node to get the successor of
+            /// @return Return Inorder Succesor
+            Node* inorderSuccessor(Node* curr);
 
-        /// @brief Helper function to recursively remove
-        /// @param key Value of node to delete
-        /// @param curr Current Node to look at
-        /// @return Node to delete
-        Node* removeHelper(Key key, Node* curr);
+            /// @brief Helper function to recursively remove
+            /// @param key Value of node to delete
+            /// @param curr Current Node to look at
+            /// @return Node to delete
+            Node* removeHelper(Key key, Node* curr);
 
-        /// @brief Helps balance tree after remove
-        /// @param curr Node that was removed
-        void fixRemove(Node* curr);
+            /// @brief Helps balance tree after remove
+            /// @param curr Node that was removed
+            void fixRemove(Node* curr);
 
-        /// @brief Change color of Node
-        /// @param curr Node to change
-        /// @param color New color
-        void recolor(Node* curr, Node::Color color);
+            /// @brief Change color of Node
+            /// @param curr Node to change
+            /// @param color New color
+            void recolor(Node* curr, Node::Color color);
 
-        /// @brief Checks the number of nodes in path from root to leaf
-        /// @param curr Current Node
-        /// @return Number of black nodes on patg
-        int checkBlackHeight(Node* curr);
+            /// @brief Checks the number of nodes in path from root to leaf
+            /// @param curr Current Node
+            /// @return Number of black nodes on patg
+            int checkBlackHeight(Node* curr);
 
-        /// @brief helps balance tree after insert
-        /// @param curr Node that was inserted
-        void fixInsert(Node* curr);
+            /// @brief helps balance tree after insert
+            /// @param curr Node that was inserted
+            void fixInsert(Node* curr);
 
-        /// @brief Helper function to make destructor faster
-        /// @param curr Current Node to delete
-        void postOrderDelete(Node* curr);
+            /// @brief Helper function to make destructor faster
+            /// @param curr Current Node to delete
+            void postOrderDelete(Node* curr);
 
-        /// @brief Testing purpose, Used to make sure all paths contain same number of black nodes
-        /// @return  Return true if valid
-        bool isValid();
-};
+            /// @brief Testing purpose, Used to make sure all paths contain same number of black nodes
+            /// @return  Return true if valid
+            bool isValid();
+    };
+}
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Iterator& RedBlackTree<Key, Value>::Iterator::operator++(){
+mystl::RedBlackTree<Key, Value>::Node::Node(std::pair<Key, Value>&& _pair) : data(_pair){
+    this->color = Color::Red;
+    this->right = nullptr;
+    this->left = nullptr;
+    this->parent = nullptr;
+}
+
+template <typename Key, typename Value>
+mystl::RedBlackTree<Key, Value>::Iterator& mystl::RedBlackTree<Key, Value>::Iterator::operator++(){
     if (current->right != nullptr) {
         current = current->right;
         while (current->left != nullptr) {
@@ -199,7 +209,7 @@ RedBlackTree<Key, Value>::Iterator& RedBlackTree<Key, Value>::Iterator::operator
 }
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::Iterator::operator++(int){
+mystl::RedBlackTree<Key, Value>::Iterator mystl::RedBlackTree<Key, Value>::Iterator::operator++(int){
     Iterator temp(*this);
     ++(*this);
     return temp;
@@ -207,23 +217,23 @@ RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::Iterator::operator+
 
 
 template <typename Key, typename Value>
-unsigned int RedBlackTree<Key, Value>::size(){
+unsigned int mystl::RedBlackTree<Key, Value>::size(){
     return this->_size;
 }
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::RedBlackTree(){
+mystl::RedBlackTree<Key, Value>::RedBlackTree(){
     this->_size = 0;
     this->root = nullptr;
 }
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::~RedBlackTree() {
+mystl::RedBlackTree<Key, Value>::~RedBlackTree() {
     postOrderDelete(root);
 }
 
 template <typename Key, typename Value>
-void RedBlackTree<Key, Value>::postOrderDelete(RedBlackTree<Key, Value>::Node* curr) {
+void mystl::RedBlackTree<Key, Value>::postOrderDelete(mystl::RedBlackTree<Key, Value>::Node* curr) {
     if (!curr) {
         return;
     }
@@ -234,7 +244,7 @@ void RedBlackTree<Key, Value>::postOrderDelete(RedBlackTree<Key, Value>::Node* c
 
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::find(Key key){
+mystl::RedBlackTree<Key, Value>::Iterator mystl::RedBlackTree<Key, Value>::find(const Key key){
     if(this->_size == 0)
         end();
 
@@ -255,13 +265,13 @@ RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::find(Key key){
 
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::insert(std::pair<const Key, Value> pair){
+mystl::RedBlackTree<Key, Value>::Iterator mystl::RedBlackTree<Key, Value>::insert(std::pair<const Key, Value> pair){
     Iterator it = find(pair.first);
     if(it != end())
         return it;
 
     unsigned int currSize = ++this->_size;
-    Node* newNode = new Node(pair.first, pair.second);
+    Node* newNode = new Node(std::move(pair));
     this->root = insertHelper(root, newNode);
     fixInsert(newNode);
     return Iterator(newNode);
@@ -269,7 +279,7 @@ RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::insert(std::pair<co
 
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::insertHelper(RedBlackTree<Key, Value>::Node* _root, RedBlackTree<Key, Value>::Node* curr){
+mystl::RedBlackTree<Key, Value>::Node* mystl::RedBlackTree<Key, Value>::insertHelper(mystl::RedBlackTree<Key, Value>::Node* _root, mystl::RedBlackTree<Key, Value>::Node* curr){
     if (!_root){
         return curr;
     }
@@ -286,7 +296,7 @@ RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::insertHelper(RedBlackT
 }
 
 template <typename Key, typename Value>
-void RedBlackTree<Key, Value>::rotateLeft(RedBlackTree<Key, Value>::Node* curr){
+void mystl::RedBlackTree<Key, Value>::rotateLeft(mystl::RedBlackTree<Key, Value>::Node* curr){
     Node* rightChild = curr->right;
     curr->right = rightChild->left;
 
@@ -307,7 +317,7 @@ void RedBlackTree<Key, Value>::rotateLeft(RedBlackTree<Key, Value>::Node* curr){
 }
 
 template <typename Key, typename Value>
-void RedBlackTree<Key, Value>::rotateRight(RedBlackTree<Key, Value>::Node* curr){
+void mystl::RedBlackTree<Key, Value>::rotateRight(mystl::RedBlackTree<Key, Value>::Node* curr){
     Node* leftChild = curr->left;
     curr->left = leftChild->right;
 
@@ -328,7 +338,7 @@ void RedBlackTree<Key, Value>::rotateRight(RedBlackTree<Key, Value>::Node* curr)
 }
 
 template <typename Key, typename Value>
-void RedBlackTree<Key, Value>::fixInsert(RedBlackTree<Key, Value>::Node* curr){
+void mystl::RedBlackTree<Key, Value>::fixInsert(mystl::RedBlackTree<Key, Value>::Node* curr){
     Node *_parent = nullptr;
     Node *grandparent = nullptr;
     while (curr != root && !isBlack(curr) && !isBlack(curr->parent)) {
@@ -381,7 +391,7 @@ void RedBlackTree<Key, Value>::fixInsert(RedBlackTree<Key, Value>::Node* curr){
 }
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::remove(Key key){
+mystl::RedBlackTree<Key, Value>::Iterator mystl::RedBlackTree<Key, Value>::remove(Key key){
     if(empty() || find(key) == end())
         return end();
     Node* curr = removeHelper(key, root);
@@ -392,7 +402,7 @@ RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::remove(Key key){
 
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::removeHelper(Key key, RedBlackTree<Key, Value>::Node* curr){
+mystl::RedBlackTree<Key, Value>::Node* mystl::RedBlackTree<Key, Value>::removeHelper(Key key, mystl::RedBlackTree<Key, Value>::Node* curr){
     if(!curr){
         throw std::out_of_range("Value not in tree");
     }
@@ -410,7 +420,7 @@ RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::removeHelper(Key key, 
 }
 
 template <typename Key, typename Value>
-void RedBlackTree<Key, Value>::fixRemove(RedBlackTree<Key, Value>::Node* curr){
+void mystl::RedBlackTree<Key, Value>::fixRemove(mystl::RedBlackTree<Key, Value>::Node* curr){
     if (curr == nullptr)
         return;
 
@@ -510,7 +520,7 @@ void RedBlackTree<Key, Value>::fixRemove(RedBlackTree<Key, Value>::Node* curr){
 }
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::inorderSuccessor(RedBlackTree<Key, Value>::Node* curr){
+mystl::RedBlackTree<Key, Value>::Node* mystl::RedBlackTree<Key, Value>::inorderSuccessor(mystl::RedBlackTree<Key, Value>::Node* curr){
     if(!curr->right)
         return nullptr;
     Node* temp = curr->right;
@@ -521,14 +531,14 @@ RedBlackTree<Key, Value>::Node* RedBlackTree<Key, Value>::inorderSuccessor(RedBl
 }
 
 template <typename Key, typename Value>
-void RedBlackTree<Key, Value>::recolor(RedBlackTree<Key, Value>::Node* curr, RedBlackTree<Key, Value>::Node::Color color){
+void mystl::RedBlackTree<Key, Value>::recolor(mystl::RedBlackTree<Key, Value>::Node* curr, mystl::RedBlackTree<Key, Value>::Node::Color color){
     if(!curr)
         return;
     curr->color = color;
 }
 
 template <typename Key, typename Value>
-bool RedBlackTree<Key, Value>::isBlack(RedBlackTree<Key, Value>::Node* curr){
+bool mystl::RedBlackTree<Key, Value>::isBlack(mystl::RedBlackTree<Key, Value>::Node* curr){
     if(curr && curr->color == Node::Color::Red)
         return false;
     else return true;
@@ -537,12 +547,12 @@ bool RedBlackTree<Key, Value>::isBlack(RedBlackTree<Key, Value>::Node* curr){
 
 
 template <typename Key, typename Value>
-bool RedBlackTree<Key, Value>::empty(){
+bool mystl::RedBlackTree<Key, Value>::empty(){
     return this->_size == 0;
 }
 
 template <typename Key, typename Value>
-bool RedBlackTree<Key, Value>::isValid(){
+bool mystl::RedBlackTree<Key, Value>::isValid(){
     if (root == nullptr) {
         return true;
     }
@@ -555,7 +565,7 @@ bool RedBlackTree<Key, Value>::isValid(){
 }
 
 template <typename Key, typename Value>
-int RedBlackTree<Key, Value>::checkBlackHeight(RedBlackTree<Key, Value>::Node* curr){
+int mystl::RedBlackTree<Key, Value>::checkBlackHeight(mystl::RedBlackTree<Key, Value>::Node* curr){
     if (curr == nullptr) {
         return 1;
     }

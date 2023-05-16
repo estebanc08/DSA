@@ -5,154 +5,156 @@
 #include "queue.hpp"
 #include <iterator>
 
-/// @brief Binary Search Tree implementation
-template <typename T>
-class BST{
-    private:
-        struct Node{
-                unsigned int count;
-                T data;
-                Node* left;
-                Node* right;
-                Node* parent;
-                Node(T data);
-        };
-        Node* root;
-    
-    public:
+namespace mystl{
+    /// @brief Binary Search Tree implementation
+    template <typename T>
+    class BST{
+        private:
+            struct Node{
+                    unsigned int count;
+                    T data;
+                    Node* left;
+                    Node* right;
+                    Node* parent;
+                    Node(T data);
+            };
+            Node* root;
         
-        /// @brief default size to 0 and root to nullptr
-        BST();
+        public:
+            
+            /// @brief default size to 0 and root to nullptr
+            BST();
 
-        /// @brief default destructor
-        ~BST();
+            /// @brief default destructor
+            ~BST();
 
-        /// @brief Insert data 
-        /// @param data 
-        void insert(T data);
+            /// @brief Insert data 
+            /// @param data 
+            void insert(T data);
 
-        /// @brief Prints the tree using in-order
-        void printTreeInorder();
+            /// @brief Prints the tree using in-order
+            void printTreeInorder();
 
-        /// @brief Prints the tree using pre-order traversal
-        void printTreePreorder();
+            /// @brief Prints the tree using pre-order traversal
+            void printTreePreorder();
 
-        /// @brief Prints the tree using post-order traversal
-        void printTreePostorder();
-        
-        /// @brief Prints the tree using level order traversal
-        void printLevelOrder();
+            /// @brief Prints the tree using post-order traversal
+            void printTreePostorder();
+            
+            /// @brief Prints the tree using level order traversal
+            void printLevelOrder();
 
-        /// @brief Removes node with value passed in. If there is more than one node with this value, only one will be deleted
-        /// @param data 
-        /// @return returns true if there is a node with that value
-        bool remove(T data);
+            /// @brief Removes node with value passed in. If there is more than one node with this value, only one will be deleted
+            /// @param data 
+            /// @return returns true if there is a node with that value
+            bool remove(T data);
 
-        /// @brief Gets the number of nodes in the tree
-        /// @return size
-        unsigned int size();
+            /// @brief Gets the number of nodes in the tree
+            /// @return size
+            unsigned int size();
 
-        /// @brief Returns if the tree is empty
-        /// @return 
-        bool empty();
+            /// @brief Returns if the tree is empty
+            /// @return 
+            bool empty();
 
-        /// @brief Clears the tree and sets size to 0
-        void clear();
+            /// @brief Clears the tree and sets size to 0
+            void clear();
 
-        /// @brief BST class Iterator
-        class Iterator {
-            public:
-                using iterator_category = std::forward_iterator_tag;
-                using difference_type = std::ptrdiff_t;
-                using value_type = T;
-                using pointer = T*;
-                using reference = T&;
+            /// @brief BST class Iterator
+            class Iterator {
+                public:
+                    using iterator_category = std::forward_iterator_tag;
+                    using difference_type = std::ptrdiff_t;
+                    using value_type = T;
+                    using pointer = T*;
+                    using reference = T&;
 
-                /// @brief default constructor, set to null if no parameter passed               
-                Iterator(Node* node = nullptr) : current(node) {}
+                    /// @brief default constructor, set to null if no parameter passed               
+                    Iterator(Node* node = nullptr) : current(node) {}
 
-                /// @brief Dereference the iterator
-                /// @return Value at the Iterator
-                reference operator*() const {
-                    return current->data;
+                    /// @brief Dereference the iterator
+                    /// @return Value at the Iterator
+                    reference operator*() const {
+                        return current->data;
+                    }
+
+                    /// @brief Dereference pointer
+                    /// @return Pointer to the iterator
+                    pointer operator->() const {
+                        return &(current->data);
+                    }
+
+                    /// @brief Move to next value in tree
+                    /// @return Reference to next Iterator
+                    Iterator& operator++();
+
+                    /// @brief Move the iterator forward by N values
+                    /// @return Iterator at new value
+                    Iterator operator++(int);
+
+                    /// @brief Compares if iterators equal
+                    /// @return True if iterators point to same value
+                    bool operator==(const Iterator& other) const {
+                        return current == other.current;
+                    }
+
+                    /// @brief Compares if Iterators not equal
+                    /// @return True if they are not equal
+                    bool operator!=(const Iterator& other) const {
+                        return !(*this == other);
+                    }
+
+                private:
+                    mystl::BST<T>::Node* current;
+            };
+
+            Iterator begin() {
+                Node* node = root;
+                while (node->left != nullptr) {
+                    node = node->left;
                 }
-
-                /// @brief Dereference pointer
-                /// @return Pointer to the iterator
-                pointer operator->() const {
-                    return &(current->data);
-                }
-
-                /// @brief Move to next value in tree
-                /// @return Reference to next Iterator
-                Iterator& operator++();
-
-                /// @brief Move the iterator forward by N values
-                /// @return Iterator at new value
-                Iterator operator++(int);
-
-                /// @brief Compares if iterators equal
-                /// @return True if iterators point to same value
-                bool operator==(const Iterator& other) const {
-                    return current == other.current;
-                }
-
-                /// @brief Compares if Iterators not equal
-                /// @return True if they are not equal
-                bool operator!=(const Iterator& other) const {
-                    return !(*this == other);
-                }
-
-            private:
-                BST<T>::Node* current;
-        };
-
-        Iterator begin() {
-            Node* node = root;
-            while (node->left != nullptr) {
-                node = node->left;
+                return Iterator(node);
             }
-            return Iterator(node);
-        }
 
-        Iterator end() {
-            return Iterator(nullptr);
-        }
+            Iterator end() {
+                return Iterator(nullptr);
+            }
 
-        // @brief findes for the data in the tree
-        /// @param data 
-        /// @return returns true if found, else returns false
-        Iterator find(T data);
+            // @brief findes for the data in the tree
+            /// @param data 
+            /// @return returns true if found, else returns false
+            Iterator find(T data);
 
-    private:
-        unsigned int _size;
+        private:
+            unsigned int _size;
 
-        /// @brief Needed for insert recursion
-        /// @param data 
-        /// @param curr 
-        /// @return returns the new node inserted or increments counter
-        Node* insertHelper(T data, Node* curr, Node* parent);
-    
-        /// @brief helps the tree inorder
-        /// @param curr 
-        void printInorderHelper(Node* curr);
+            /// @brief Needed for insert recursion
+            /// @param data 
+            /// @param curr 
+            /// @return returns the new node inserted or increments counter
+            Node* insertHelper(T data, Node* curr, Node* parent);
+        
+            /// @brief helps the tree inorder
+            /// @param curr 
+            void printInorderHelper(Node* curr);
 
-        /// @brief helps the tree inorder
-        /// @param curr 
-        void printProrderHelper(Node* curr);
+            /// @brief helps the tree inorder
+            /// @param curr 
+            void printProrderHelper(Node* curr);
 
-        /// @brief helps the tree inorder
-        /// @param curr 
-        void printPostorderHelper(Node* curr);
+            /// @brief helps the tree inorder
+            /// @param curr 
+            void printPostorderHelper(Node* curr);
 
-        /// @brief Used to hide remove implementation
-        /// @param curr 
-        /// @return return Node pointer to assign new left and right
-        Node* removeHelper(T target, Node* curr, Node* parent);
-};
+            /// @brief Used to hide remove implementation
+            /// @param curr 
+            /// @return return Node pointer to assign new left and right
+            Node* removeHelper(T target, Node* curr, Node* parent);
+    };
+}
 
 template <typename T>
-BST<T>::Iterator& BST<T>::Iterator::operator++(){
+mystl::BST<T>::Iterator& mystl::BST<T>::Iterator::operator++(){
         if (current->right != nullptr) {
             current = current->right;
             while (current->left != nullptr) {
@@ -172,14 +174,14 @@ BST<T>::Iterator& BST<T>::Iterator::operator++(){
 
 
 template <typename T>
-BST<T>::Iterator BST<T>::Iterator::operator++(int){
+mystl::BST<T>::Iterator mystl::BST<T>::Iterator::operator++(int){
     Iterator temp(*this);
     ++(*this);
     return temp;
 }
 
 template <typename T>
-BST<T>::Node::Node(T data){
+mystl::BST<T>::Node::Node(T data){
     this->data = data;
     left = nullptr;
     right = nullptr;
@@ -188,24 +190,24 @@ BST<T>::Node::Node(T data){
 }
 
 template <typename T>
-BST<T>::BST(){
+mystl::BST<T>::BST(){
     this->_size = 0;
     this->root = nullptr;
 }
 
 template <typename T>
-BST<T>::~BST(){
+mystl::BST<T>::~BST(){
     clear();
 }
 
 template <typename T>
-void BST<T>::insert(T data){
+void mystl::BST<T>::insert(T data){
     this->_size++;
     this->root = insertHelper(data, this->root, nullptr);
 }
 
 template <typename T>
-BST<T>::Node* BST<T>::insertHelper(T data, BST<T>::Node* curr, BST<T>::Node* parent){
+mystl::BST<T>::Node* mystl::BST<T>::insertHelper(T data, mystl::BST<T>::Node* curr, mystl::BST<T>::Node* parent){
     if(!curr){
         Node* newNode = new Node(data);
         newNode->parent = parent;
@@ -224,13 +226,13 @@ BST<T>::Node* BST<T>::insertHelper(T data, BST<T>::Node* curr, BST<T>::Node* par
 }
 
 template <typename T>
-void BST<T>::printTreeInorder(){
+void mystl::BST<T>::printTreeInorder(){
     printInorderHelper(this->root);
     std::cout << "\n";
 }
 
 template <typename T>
-void BST<T>::printInorderHelper(BST<T>::Node* curr){
+void mystl::BST<T>::printInorderHelper(mystl::BST<T>::Node* curr){
     if(!curr)
         return;
     if(curr->left)
@@ -242,13 +244,13 @@ void BST<T>::printInorderHelper(BST<T>::Node* curr){
 }
 
 template <typename T>
-void BST<T>::printTreePreorder(){
+void mystl::BST<T>::printTreePreorder(){
     printProrderHelper(this->root);
     std::cout << "\n";
 }
 
 template <typename T>
-void BST<T>::printProrderHelper(BST<T>::Node* curr){
+void mystl::BST<T>::printProrderHelper(mystl::BST<T>::Node* curr){
     if(!curr)
         return;
     for(unsigned int i = 0; i < curr->count; i++)
@@ -260,13 +262,13 @@ void BST<T>::printProrderHelper(BST<T>::Node* curr){
 }
 
 template <typename T>
-void BST<T>::printTreePostorder(){
+void mystl::BST<T>::printTreePostorder(){
     printPostorderHelper(this->root);
     std::cout << "\n";
 }
 
 template <typename T>
-void BST<T>::printPostorderHelper(BST<T>::Node* curr){
+void mystl::BST<T>::printPostorderHelper(mystl::BST<T>::Node* curr){
     if(!curr)
         return;
     if(curr->left)
@@ -277,12 +279,12 @@ void BST<T>::printPostorderHelper(BST<T>::Node* curr){
         std::cout << curr->data << " ";
 }
 template <typename T>
-unsigned int BST<T>::size(){
+unsigned int mystl::BST<T>::size(){
     return this->_size;
 }
 
 template <typename T>
-BST<T>::Iterator BST<T>::find(T data){
+mystl::BST<T>::Iterator mystl::BST<T>::find(T data){
     if(this->_size == 0)
         return end();
     
@@ -296,7 +298,7 @@ BST<T>::Iterator BST<T>::find(T data){
 }
 
 template <typename T>
-bool BST<T>::remove(T data){
+bool mystl::BST<T>::remove(T data){
     if(this->_size == 0 || find(data) == end())
         return false;
     this->root = removeHelper(data, root, nullptr);
@@ -305,7 +307,7 @@ bool BST<T>::remove(T data){
 }
 
 template <typename T>
-typename BST<T>::Node* BST<T>::removeHelper(T target, BST<T>::Node* curr, BST<T>::Node* parent){
+typename mystl::BST<T>::Node* mystl::BST<T>::removeHelper(T target, mystl::BST<T>::Node* curr, mystl::BST<T>::Node* parent){
     if (!curr){
         return nullptr;
     }
@@ -365,12 +367,12 @@ typename BST<T>::Node* BST<T>::removeHelper(T target, BST<T>::Node* curr, BST<T>
 
 
 template <typename T>
-bool BST<T>::empty(){
+bool mystl::BST<T>::empty(){
     return this->_size == 0;
 }
 
 template <typename T>
-void BST<T>::printLevelOrder(){
+void mystl::BST<T>::printLevelOrder(){
     if(!this->root)
         return;
     
@@ -395,7 +397,7 @@ void BST<T>::printLevelOrder(){
 }
 
 template <typename T>
-void BST<T>::clear(){
+void mystl::BST<T>::clear(){
     while(root)
         root = removeHelper(root->data, root, nullptr);
     this->_size = 0;

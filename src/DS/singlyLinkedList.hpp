@@ -3,89 +3,91 @@
 
 #include <iostream>
 
-/// @brief Singly Linked List with head and tail pointers
-template <class T> 
-class SinglyLinkedList{
-    public:
-        /// @brief Default constructor
-        SinglyLinkedList(){};
+namespace mystl{
+    /// @brief Singly Linked List with head and tail pointers
+    template <class T> 
+    class SinglyLinkedList{
+        public:
+            /// @brief Default constructor
+            SinglyLinkedList(){};
 
-        /// @brief Default linked list destructor
-        ~SinglyLinkedList();
+            /// @brief Default linked list destructor
+            ~SinglyLinkedList();
 
-        /// @brief get the size of the list
-        /// @return returns an unsigned integer value with the size of the list
-        unsigned int size();
+            /// @brief get the size of the list
+            /// @return returns an unsigned integer value with the size of the list
+            unsigned int size();
 
-        /// @brief Push data to end of the list
-        /// @param data 
-        void push_back(T data);
+            /// @brief Push data to end of the list
+            /// @param data 
+            void push_back(T data);
 
-        /// @brief Creates a new head of the list
-        /// @param data 
-        void push_front(T data);
+            /// @brief Creates a new head of the list
+            /// @param data 
+            void push_front(T data);
 
-        /// @brief Insert  data into specified position if that position within bounds of list
-        /// @param data 
-        /// @param pos 
-        void insert(T data, unsigned int pos);
+            /// @brief Insert  data into specified position if that position within bounds of list
+            /// @param data 
+            /// @param pos 
+            void insert(T data, unsigned int pos);
 
-        /// @brief Remove an item from the list at the given position if it exists
-        /// @param pos 
-        void removeAt(unsigned int pos);
+            /// @brief Remove an item from the list at the given position if it exists
+            /// @param pos 
+            void removeAt(unsigned int pos);
 
-        /// @brief Iterate the list and print all values
-        void printList();
+            /// @brief Iterate the list and print all values
+            void printList();
 
-        /// @brief Search for a value in the list, will only return first value
-        /// @param data 
-        /// @return retrun true if value found
-        bool search(T data);
+            /// @brief Search for a value in the list, will only return first value
+            /// @param data 
+            /// @return retrun true if value found
+            bool search(T data);
 
-        /// @brief Returns reference to the value at the given position if valid, otherwise throws error
-        /// @param pos 
-        /// @return 
-        T& operator[](unsigned int pos);
+            /// @brief Returns reference to the value at the given position if valid, otherwise throws error
+            /// @param pos 
+            /// @return 
+            T& operator[](unsigned int pos);
 
-        /// @brief creates deep copy of list
-        /// @return new List
-        SinglyLinkedList& operator=(const SinglyLinkedList& RHS);
+            /// @brief creates deep copy of list
+            /// @return new List
+            SinglyLinkedList& operator=(const SinglyLinkedList& RHS);
 
-        /// @brief instantiates new list
-        /// @return new List
-        SinglyLinkedList(const SinglyLinkedList& RHS);
+            /// @brief instantiates new list
+            /// @return new List
+            SinglyLinkedList(const SinglyLinkedList& RHS);
 
-        /// @brief clears all data from the list and resets size to 0
-        void clear();
+            /// @brief clears all data from the list and resets size to 0
+            void clear();
 
-        /// @brief Returns the value at the given position if valid, otherwise throws error
-        /// @param pos 
-        /// @return value at that position
-        T at(unsigned int pos);
+            /// @brief Returns the value at the given position if valid, otherwise throws error
+            /// @param pos 
+            /// @return value at that position
+            T at(unsigned int pos);
 
-        /// @brief Returns if the list is empty
-        /// @return 
-        bool empty();
+            /// @brief Returns if the list is empty
+            /// @return 
+            bool empty();
 
 
-    private:
-        struct Node{
-            T data;
-            Node* next;
-            Node(T _data) : data(_data) {next = nullptr;};
-        };
-        unsigned int _size = 0;
-        Node* head = nullptr;
-        Node* tail = nullptr;
-};
+        private:
+            struct Node{
+                T data;
+                Node* next;
+                Node(T _data) : data(_data) {next = nullptr;};
+            };
+            unsigned int _size = 0;
+            Node* head = nullptr;
+            Node* tail = nullptr;
+    };
+}
 
 template<typename T>
-unsigned int SinglyLinkedList<T>::size(){
+unsigned int mystl::SinglyLinkedList<T>::size(){
     return this->_size;
 }
 
 template<typename T>
-void SinglyLinkedList<T>::push_front(T data){
+void mystl::SinglyLinkedList<T>::push_front(T data){
     this->_size++;
     if(head){
         Node* newHead = new Node(data);
@@ -99,7 +101,7 @@ void SinglyLinkedList<T>::push_front(T data){
 }
 
 template<typename T>
-void SinglyLinkedList<T>::push_back(T data){
+void mystl::SinglyLinkedList<T>::push_back(T data){
     if(!head){
         push_front(data);
         this->tail = this->head;
@@ -114,7 +116,7 @@ void SinglyLinkedList<T>::push_back(T data){
 }
 
 template<typename T>
-void SinglyLinkedList<T>::insert(T data, unsigned int pos){
+void mystl::SinglyLinkedList<T>::insert(T data, unsigned int pos){
     if(pos == 0){
         push_front(data);
         return;
@@ -140,12 +142,12 @@ void SinglyLinkedList<T>::insert(T data, unsigned int pos){
 
 
 template<typename T>
-SinglyLinkedList<T>::~SinglyLinkedList(){
+mystl::SinglyLinkedList<T>::~SinglyLinkedList(){
     clear();
 }
 
 template<typename T>
-void SinglyLinkedList<T>::printList(){
+void mystl::SinglyLinkedList<T>::printList(){
     Node* temp = head;
     while(temp){
         std::cout << temp->data << " ";
@@ -155,7 +157,7 @@ void SinglyLinkedList<T>::printList(){
 }
 
 template<typename T>
-void SinglyLinkedList<T>::removeAt(unsigned int pos){
+void mystl::SinglyLinkedList<T>::removeAt(unsigned int pos){
     if(pos >= this->_size || this->_size == 0)
         throw std::out_of_range("Invalid index");
     this->_size--;
@@ -180,7 +182,7 @@ void SinglyLinkedList<T>::removeAt(unsigned int pos){
 }
 
 template <typename T>
-bool SinglyLinkedList<T>::search(T data){
+bool mystl::SinglyLinkedList<T>::search(T data){
     Node* temp = head;
     while(temp){
         if(temp->data == data)
@@ -191,12 +193,12 @@ bool SinglyLinkedList<T>::search(T data){
 }
 
 template <typename T>
-T SinglyLinkedList<T>::at(unsigned int pos){
+T mystl::SinglyLinkedList<T>::at(unsigned int pos){
     return T(operator[](pos));
 }
 
 template <typename T>
-T& SinglyLinkedList<T>::operator[](unsigned int pos){
+T& mystl::SinglyLinkedList<T>::operator[](unsigned int pos){
     if(pos >= this->_size)
         throw std::out_of_range("Invalid index");
     Node* temp = head;
@@ -207,7 +209,7 @@ T& SinglyLinkedList<T>::operator[](unsigned int pos){
 }
 
 template <typename T>
-SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(const SinglyLinkedList<T>& RHS){
+mystl::SinglyLinkedList<T>& mystl::SinglyLinkedList<T>::operator=(const mystl::SinglyLinkedList<T>& RHS){
     this->_size = RHS._size;
     Node* oldTemp = RHS.head;
     this->head = nullptr;
@@ -229,7 +231,7 @@ SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(const SinglyLinkedList<T>& R
 }
 
 template <typename T>
-SinglyLinkedList<T>::SinglyLinkedList(const SinglyLinkedList<T>& RHS){
+mystl::SinglyLinkedList<T>::SinglyLinkedList(const SinglyLinkedList<T>& RHS){
     this->_size = RHS._size;
     Node* oldTemp = RHS.head;
     this->head = nullptr;
@@ -249,7 +251,7 @@ SinglyLinkedList<T>::SinglyLinkedList(const SinglyLinkedList<T>& RHS){
 }
 
 template <typename T>
-void SinglyLinkedList<T>::clear(){
+void mystl::SinglyLinkedList<T>::clear(){
     if(!head)
         return;
     
@@ -264,7 +266,7 @@ void SinglyLinkedList<T>::clear(){
 }
 
 template <typename T>
-bool SinglyLinkedList<T>::empty(){
+bool mystl::SinglyLinkedList<T>::empty(){
     return this->_size == 0;
 }
 
