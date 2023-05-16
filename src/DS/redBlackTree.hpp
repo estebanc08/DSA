@@ -18,7 +18,7 @@ class RedBlackTree{
             Node* left;
             Node* right;
             Node* parent;
-            Node(Key _key,Value _value ) : data(std::make_pair(_key, _value)) {color = Color::Red;};
+            Node(std::pair<Key, Value>&& _pair);
         };
         Node* root;
     
@@ -106,7 +106,7 @@ class RedBlackTree{
         /// @brief Finds value in the tree
         /// @param key Value to find
         /// @return Returns Iterator to value if found in tree, otherwise returns end
-        Iterator find(Key key);
+        Iterator find(const Key key);
 
         /// @brief Insert new value into tree
         /// @param key Key to be inserted
@@ -180,6 +180,14 @@ class RedBlackTree{
 };
 
 template <typename Key, typename Value>
+RedBlackTree<Key, Value>::Node::Node(std::pair<Key, Value>&& _pair) : data(_pair){
+    this->color = Color::Red;
+    this->right = nullptr;
+    this->left = nullptr;
+    this->parent = nullptr;
+}
+
+template <typename Key, typename Value>
 RedBlackTree<Key, Value>::Iterator& RedBlackTree<Key, Value>::Iterator::operator++(){
     if (current->right != nullptr) {
         current = current->right;
@@ -234,7 +242,7 @@ void RedBlackTree<Key, Value>::postOrderDelete(RedBlackTree<Key, Value>::Node* c
 
 
 template <typename Key, typename Value>
-RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::find(Key key){
+RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::find(const Key key){
     if(this->_size == 0)
         end();
 
@@ -261,7 +269,7 @@ RedBlackTree<Key, Value>::Iterator RedBlackTree<Key, Value>::insert(std::pair<co
         return it;
 
     unsigned int currSize = ++this->_size;
-    Node* newNode = new Node(pair.first, pair.second);
+    Node* newNode = new Node(std::move(pair));
     this->root = insertHelper(root, newNode);
     fixInsert(newNode);
     return Iterator(newNode);
