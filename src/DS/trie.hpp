@@ -213,12 +213,11 @@ void Trie::startsWithHelper(Node* curr, std::string& currentPrefix, std::vector<
 
 
 int Trie::getIndex(char letter){
-     if(!std::isalpha(letter))
-        return -1;
     if(letter >= 'a' && letter <= 'z')
         return letter - 'a';
     else if(letter >= 'A' && letter <= 'Z') //capitalization matters
         return letter - 'A' + 26;
+    return -1;
 }
 
 
